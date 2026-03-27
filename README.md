@@ -193,4 +193,4 @@ npm run bot:claim
 - [ ] README links completed:
   - [ ] live demo link
   - [ ] test output screenshot
-  - [ ] 1-minute demo video link
+  - [x] 1-minute demo video link: https://youtu.be/UBJtXyQNLoU
