@@ -7,6 +7,11 @@ import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const hasWalletSession = useSyncExternalStore(
     () => () => {},
     () => Boolean(window.localStorage.getItem("guardian_wallet_address")),
@@ -14,21 +19,25 @@ export default function DashboardPage() {
   );
 
   useEffect(() => {
-    if (!hasWalletSession) {
+    if (hydrated && !hasWalletSession) {
       router.replace("/");
     }
-  }, [hasWalletSession, router]);
+  }, [hasWalletSession, hydrated, router]);
 
-  if (!hasWalletSession) {
+  if (!hydrated || !hasWalletSession) {
     return (
       <main className="p-8">
-        <p className="text-sm text-amber-300">Wallet not connected.</p>
+        <p className="text-sm text-blue-200/80">Loading wallet session...</p>
         <Link href="/" className="mt-4 inline-block text-sm text-blue-300 hover:text-blue-200">
-          Go back to landing
+          Go to landing
         </Link>
       </main>
     );
   }
 
-  return <GuardianShieldDashboard />;
+  return (
+    <main className="mx-auto w-full max-w-[1280px] px-4 py-6 sm:px-6 lg:px-8">
+      <GuardianShieldDashboard />
+    </main>
+  );
 }
