@@ -26,7 +26,7 @@ const iconMap: Record<ActivityTimelineItem["type"], typeof ArrowDownUp> = {
 };
 
 function formatTime(timestamp: number): string {
-  return new Date(timestamp * 1000).toLocaleTimeString();
+  return new Date(timestamp * 1000).toLocaleString();
 }
 
 export function Timeline({ items }: { items: ActivityTimelineItem[] }) {

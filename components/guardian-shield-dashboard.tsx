@@ -61,6 +61,10 @@ function shortAddress(address: string): string {
   return address ? `${address.slice(0, 8)}...${address.slice(-6)}` : "Unknown";
 }
 
+function tinyAddress(address: string): string {
+  return address ? `${address.slice(0, 3)}......` : "Unknown";
+}
+
 function resolveHealthStatus(status: UiVaultStatus, remainingSeconds: number): HealthStatus {
   const hasFunds = BigInt(status.vaultBalance || "0") > BigInt(0);
   if (!hasFunds) return "healthy";
@@ -194,13 +198,15 @@ export default function GuardianShieldDashboard() {
     queryKey: ACTIVITY_QUERY_KEY,
     queryFn: async () => {
       const logs = await getService().getActivityLogs();
-      return logs.map((entry, index): ActivityTimelineItem => ({
-        id: `${entry.timestamp}-${entry.actor}-${entry.eventType}-${index}`,
-        type: mapActivityType(entry.eventType),
-        actor: entry.actor || "unknown",
-        amount: entry.amount,
-        timestamp: entry.timestamp,
-      }));
+      return logs
+        .map((entry, index): ActivityTimelineItem => ({
+          id: `${entry.timestamp}-${entry.actor}-${entry.eventType}-${index}`,
+          type: mapActivityType(entry.eventType),
+          actor: entry.actor || "unknown",
+          amount: entry.amount,
+          timestamp: entry.timestamp,
+        }))
+        .sort((a, b) => b.timestamp - a.timestamp);
     },
     refetchInterval: 5_000,
   });
@@ -308,9 +314,7 @@ export default function GuardianShieldDashboard() {
     if (!statusQuery.data) return null;
     const status = statusQuery.data;
     const hasFunds = BigInt(status.vaultBalance || "0") > BigInt(0);
-    const remainingSeconds = hasFunds
-      ? Math.max(0, status.lastCheckIn + status.thresholdSeconds - clockNow)
-      : status.thresholdSeconds;
+    const remainingSeconds = hasFunds ? Math.max(0, status.lastCheckIn + status.thresholdSeconds - clockNow) : 0;
     const progress = hasFunds
       ? status.claimed || status.thresholdSeconds <= 0
         ? 100
@@ -359,17 +363,23 @@ export default function GuardianShieldDashboard() {
   return (
     <div className="space-y-4">
       <header className="rounded-2xl border border-blue-400/20 bg-slate-950/55 px-5 py-3 backdrop-blur-xl">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-blue-300" />
-            <p className="font-semibold text-blue-100">Guardian Shield</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="rounded-full border border-blue-300/20 bg-blue-500/10 px-3 py-1 text-xs text-blue-200">
-              {shortAddress(connectedAddress)}
+        <div className="flex flex-wrap items-center justify-between gap-3 xl:flex-nowrap">
+          <div className="flex min-w-0 items-center gap-3">
+            <Shield className="h-6 w-6 text-blue-300" />
+            <p className="whitespace-nowrap text-2xl font-bold tracking-wide text-blue-50">Guardian Shield</p>
+            <span className="whitespace-nowrap rounded-full border border-blue-300/20 bg-blue-500/10 px-3 py-1 text-xs text-blue-200">
+              Owner: {tinyAddress(presentation.owner)}
             </span>
-            <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
+          </div>
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="whitespace-nowrap rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
               Connected
+            </span>
+            <span
+              title={connectedAddress || "Not connected"}
+              className="min-w-0 max-w-[480px] truncate rounded-full border border-blue-300/20 bg-blue-500/10 px-3 py-1 text-xs text-blue-200"
+            >
+              Wallet: {connectedAddress || "Not connected"}
             </span>
             <button
               type="button"
@@ -462,6 +472,7 @@ export default function GuardianShieldDashboard() {
               </div>
 
               <ThresholdControl
+                key={`threshold-${presentation.thresholdSeconds}`}
                 currentThreshold={presentation.thresholdSeconds}
                 isUpdating={thresholdMutation.isPending}
                 disabled={isBusy}
@@ -476,6 +487,7 @@ export default function GuardianShieldDashboard() {
               />
 
               <VaultConfigControl
+                key={presentation.beneficiaries.map((b) => `${b.address}:${b.percentage}`).join("|")}
                 currentBeneficiaries={presentation.beneficiaries.map((item) => ({
                   beneficiary: item.address,
                   percentage: item.percentage,

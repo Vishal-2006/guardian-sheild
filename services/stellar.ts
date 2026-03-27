@@ -153,12 +153,7 @@ export class GuardianShieldStellarService {
 
     return this.invokeAndSubmitWithFreighter("update_config", [
       nativeToScVal(newOwner, { type: "address" }),
-      nativeToScVal(
-        beneficiaries.map((entry) => ({
-          beneficiary: entry.beneficiary,
-          percentage: entry.percentage,
-        })),
-      ),
+      beneficiariesToScVal(beneficiaries),
       nativeToScVal(Math.floor(input.thresholdSeconds), { type: "u64" }),
     ]);
   }
@@ -391,6 +386,23 @@ function stringifyAddress(value: unknown): string {
   }
 
   return "";
+}
+
+function beneficiariesToScVal(beneficiaries: ConfigBeneficiaryInput[]): xdr.ScVal {
+  const entries = beneficiaries.map((entry) =>
+    xdr.ScVal.scvMap([
+      new xdr.ScMapEntry({
+        key: xdr.ScVal.scvSymbol("beneficiary"),
+        val: nativeToScVal(entry.beneficiary, { type: "address" }),
+      }),
+      new xdr.ScMapEntry({
+        key: xdr.ScVal.scvSymbol("percentage"),
+        val: nativeToScVal(Math.floor(entry.percentage), { type: "u32" }),
+      }),
+    ]),
+  );
+
+  return xdr.ScVal.scvVec(entries);
 }
 
 export function createGuardianShieldService(): GuardianShieldStellarService {
