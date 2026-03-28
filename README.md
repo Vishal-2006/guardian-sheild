@@ -1,69 +1,55 @@
-# Guardian Shield
+# ??? Guardian Shield - Soroban Crypto Inheritance Vault
 
-A production-style Soroban inheritance vault mini-dApp.
+![Stellar](https://img.shields.io/badge/Stellar-Soroban-0ea5e9?style=for-the-badge)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-2563eb?style=for-the-badge)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06b6d4?style=for-the-badge)
+![Rust](https://img.shields.io/badge/Rust-Contract-f97316?style=for-the-badge)
+![Railway](https://img.shields.io/badge/Railway-Bot-7c3aed?style=for-the-badge)
 
-Guardian Shield allows an owner to deposit funds and periodically check in. If inactivity exceeds the configured threshold, beneficiaries can claim the vault according to percentage splits.
+Guardian Shield is a decentralized inheritance dApp on Stellar Soroban. The owner deposits funds and checks in periodically. If inactivity exceeds the threshold, beneficiaries can claim based on configured percentage splits.
 
-## Demo
+---
 
-- Demo video (1 minute): https://youtu.be/UBJtXyQNLoU
-- Live app: https://guardian-sheild.vercel.app/
-- Test output screenshot: included in submission (shows `11 passed; 0 failed`)
+## ?? Live Links
 
-## Table of Contents
+- ?? **Live App (Vercel):** https://guardian-sheild.vercel.app/
+- ?? **Demo Video (1 min):** https://youtu.be/UBJtXyQNLoU
 
-- [What It Does](#what-it-does)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Smart Contract API](#smart-contract-api)
-- [Project Structure](#project-structure)
-- [Local Setup](#local-setup)
-- [Contract Build and Deploy](#contract-build-and-deploy)
-- [Testing](#testing)
-- [Bot Modes](#bot-modes)
-- [Deployment](#deployment)
-- [Security](#security)
-- [Troubleshooting](#troubleshooting)
+---
 
-## What It Does
+## ?? About the Project
 
-### Owner flow
+### Owner Flow
+1. Connect wallet
+2. Initialize vault configuration
+3. Deposit funds
+4. Check in periodically
+5. Update threshold / beneficiaries
+6. Reset vault after claim
 
-1. Connect wallet.
-2. Initialize vault config (owner, beneficiaries, threshold).
-3. Deposit funds.
-4. Check in periodically.
-5. Update threshold/beneficiary config when needed.
-6. Reset vault after claim to start a new cycle.
+### Beneficiary Flow
+1. Connect wallet
+2. View vault status and timeline
+3. Claim when inactivity threshold is reached
 
-### Beneficiary flow
+### Core Behavior
+- Timer is armed only when vault has funds.
+- First deposit from zero starts the timer context.
+- Claim is blocked if vault is empty or already claimed.
 
-1. Connect wallet.
-2. View vault status and timeline.
-3. Claim once inactivity conditions are met.
+---
 
-### Production behavior
+## ?? Tech Stack
 
-- Inactivity timer is armed only when vault balance is greater than zero.
-- First deposit from zero sets check-in context.
-- Claim is blocked if balance is zero or already claimed.
+- **Frontend:** Next.js 16, TypeScript, Tailwind CSS, React Query
+- **Smart Contract:** Rust + `soroban-sdk`
+- **Wallet & Tx:** `@stellar/freighter-api`, `@stellar/stellar-sdk`
+- **Bot Automation:** Railway worker (`scripts/guardian-claim-bot.mjs`)
 
-## Architecture
+---
 
-- `contract/` stores Soroban Rust smart contracts.
-- `services/stellar.ts` handles read/write contract interaction from frontend.
-- `app/` and `components/` provide wallet-gated landing + dashboard UX.
-- `scripts/guardian-claim-bot.mjs` runs daemon-style off-chain auto-claim.
-- `app/api/cron/claim/route.ts` runs single-execution claim checks for cron platforms.
-
-## Tech Stack
-
-- Frontend: Next.js 16, TypeScript, Tailwind CSS, React Query
-- Blockchain: Stellar Soroban (`soroban-sdk` in Rust)
-- Wallet + tx: `@stellar/freighter-api`, `@stellar/stellar-sdk`
-- Automation: Node.js claim bot (daemon mode and cron mode)
-
-## Smart Contract API
+## ?? Smart Contract API
 
 - `init(owner, beneficiaries, threshold_seconds)`
 - `deposit(amount)`
@@ -77,28 +63,29 @@ Guardian Shield allows an owner to deposit funds and periodically check in. If i
 - `get_status()`
 - `get_activity_logs()`
 
-## Project Structure
+---
+
+## ?? Project Structure
 
 ```text
 app/                            Next.js app router pages and API routes
 components/                     Dashboard UI components
 services/stellar.ts             Soroban service layer used by frontend
-scripts/guardian-claim-bot.mjs  Long-running bot (polling mode)
-lib/claim-bot/run-once.mjs      Reusable single-run bot logic
+scripts/guardian-claim-bot.mjs  Railway auto-claim bot (polling)
 contract/contracts/guardian-shield/src/lib.rs   Main contract
 contract/contracts/guardian-shield/src/test.rs  Contract tests
 ```
 
-## Local Setup
+---
+
+## ?? Local Setup
 
 ### 1) Install dependencies
-
 ```bash
 npm install
 ```
 
-### 2) Configure frontend env (`.env.local`)
-
+### 2) Configure `.env.local`
 ```env
 NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
 NEXT_PUBLIC_GUARDIAN_CONTRACT_ID=<DEPLOYED_CONTRACT_ID>
@@ -106,20 +93,16 @@ NEXT_PUBLIC_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
 NEXT_PUBLIC_GUARDIAN_SOURCE_PUBLIC_KEY=<PUBLIC_G_ADDRESS_FOR_READS>
 ```
 
-Important:
+> Never put secret keys in any `NEXT_PUBLIC_*` variable.
 
-- Never place secret keys in any `NEXT_PUBLIC_*` variable.
-- `NEXT_PUBLIC_GUARDIAN_SOURCE_PUBLIC_KEY` must be a `G...` address.
-
-### 3) Run app
-
+### 3) Run frontend
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+---
 
-## Contract Build and Deploy
+## ??? Contract Build & Deploy
 
 From `contract/`:
 
@@ -140,137 +123,81 @@ Verify:
 stellar contract invoke --id <CONTRACT_ID> --source <owner_identity> --network testnet -- get_status
 ```
 
-## Testing
+---
 
-Run contract tests:
+## ? Testing
 
-```bash
-cd contract
-cargo test -p guardian-shield --manifest-path Cargo.toml
-```
-
-Current suite: 11 passing tests.
-
-### Latest Test Run (from screenshot)
-
-Command used:
+Run tests:
 
 ```bash
 cd contract
 cargo test -p guardian-shield --manifest-path Cargo.toml
 ```
 
-Observed result:
+Current result: **11 passed, 0 failed**.
 
-```text
-running 11 tests
-...
-test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
-```
+![Contract test output](screenshots/test-output.png)
 
-If you want the screenshot rendered in GitHub README, save the image at `docs/test-output.png` and add:
+---
 
-```md
-![Contract test output](docs/test-output.png)
-```
+## ?? Railway Bot (Auto Claim)
 
-## Bot Modes
+Use Railway to run auto-claim continuously.
 
-### Mode A: Local daemon bot (polling)
-
-Required env:
-
-- `SOROBAN_RPC_URL`
-- `GUARDIAN_CONTRACT_ID`
-- `NETWORK_PASSPHRASE`
-- `CLAIM_BOT_SECRET_KEY`
-- optional: `CLAIM_BOT_POLL_MS`
-
-Run:
-
-```bash
-npm run bot:claim
-```
-
-### Mode B: Cron single-run bot
-
-Route:
-
-- `GET /api/cron/claim`
-
-Required env:
-
-- `SOROBAN_RPC_URL`
-- `GUARDIAN_CONTRACT_ID`
-- `NETWORK_PASSPHRASE`
-- `CLAIM_BOT_SECRET_KEY`
-- optional: `CLAIM_BOT_FINALITY_TIMEOUT_MS`
-- optional: `CRON_SECRET`
-
-If `CRON_SECRET` is set, send:
-
-```text
-Authorization: Bearer <CRON_SECRET>
-```
-
-## Deployment
-
-### Frontend on Vercel
-
-Set Vercel env:
-
-- `NEXT_PUBLIC_SOROBAN_RPC_URL`
-- `NEXT_PUBLIC_GUARDIAN_CONTRACT_ID`
-- `NEXT_PUBLIC_NETWORK_PASSPHRASE`
-- `NEXT_PUBLIC_GUARDIAN_SOURCE_PUBLIC_KEY`
-
-### Bot on Railway (recommended)
-
-Set Railway env:
-
+### Required Railway Environment Variables
 - `SOROBAN_RPC_URL`
 - `GUARDIAN_CONTRACT_ID`
 - `NETWORK_PASSPHRASE`
 - `CLAIM_BOT_SECRET_KEY`
 - `CLAIM_BOT_POLL_MS`
+- optional: `CLAIM_BOT_FINALITY_TIMEOUT_MS`
 
-Start command:
+### Railway Commands
+- **Build:** `npm install`
+- **Start:** `node scripts/guardian-claim-bot.mjs`
 
-```bash
-node scripts/guardian-claim-bot.mjs
-```
+Expected logs:
+- `Bot started for contract ...`
+- `Vault still active ...`
+- `Vault inactive. Triggering claim ...`
+- `Claim succeeded. tx=...`
 
-### Bot on Vercel Cron (Hobby limitations apply)
+---
 
-- Uses `vercel.json` schedule and `/api/cron/claim`.
-- Hobby plan restricts cron frequency.
+## ?? Deployment
 
-## Security
+### Vercel (Frontend)
+Set these env vars in Vercel:
+- `NEXT_PUBLIC_SOROBAN_RPC_URL`
+- `NEXT_PUBLIC_GUARDIAN_CONTRACT_ID`
+- `NEXT_PUBLIC_NETWORK_PASSPHRASE`
+- `NEXT_PUBLIC_GUARDIAN_SOURCE_PUBLIC_KEY`
+
+### Railway (Bot)
+Set bot vars listed above and run with:
+- `node scripts/guardian-claim-bot.mjs`
+
+---
+
+## ?? Security Notes
 
 - Never commit `.env.local`.
-- Never expose `S...` secrets to frontend/public env.
-- Rotate keys immediately if leaked.
-- Keep wallet signing in Freighter for user actions.
+- Never expose `S...` secret keys in public env.
+- Rotate keys if leaked.
+- Keep signing in Freighter for user-initiated transactions.
 
-## Troubleshooting
+---
 
-- Dashboard stuck on loading:
-  - Verify contract ID and RPC URL.
-  - Verify `NEXT_PUBLIC_GUARDIAN_SOURCE_PUBLIC_KEY` exists and is valid.
+## ?? Troubleshooting
+
+- **Dashboard stuck on loading**
+  - Check contract ID, RPC URL, and `NEXT_PUBLIC_GUARDIAN_SOURCE_PUBLIC_KEY`.
   - Restart dev server after env changes.
-- `Transaction rejected by RPC`:
-  - Ensure connected wallet is contract owner for owner-only actions.
-  - Ensure vault is initialized and not already claimed (for restricted actions).
-- Beneficiary config fails:
+
+- **Transaction rejected by RPC**
+  - Ensure connected wallet is owner for owner-only calls.
+  - Ensure vault is initialized and not already claimed.
+
+- **Beneficiary update fails**
   - Ensure percentages total exactly 100.
   - Avoid duplicate beneficiary addresses.
-
-## Submission Checklist
-
-- [x] Mini-dApp functional
-- [x] 3+ tests passing (11 passing)
-- [x] README complete
-- [x] Live demo URL added
-- [x] Test output screenshot added
-- [x] 1-minute demo video added
-- [ ] 3+ meaningful commits visible in Git history
