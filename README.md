@@ -151,6 +151,29 @@ cargo test -p guardian-shield --manifest-path Cargo.toml
 
 Current suite: 11 passing tests.
 
+### Latest Test Run (from screenshot)
+
+Command used:
+
+```bash
+cd contract
+cargo test -p guardian-shield --manifest-path Cargo.toml
+```
+
+Observed result:
+
+```text
+running 11 tests
+...
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+```
+
+If you want the screenshot rendered in GitHub README, save the image at `docs/test-output.png` and add:
+
+```md
+![Contract test output](docs/test-output.png)
+```
+
 ## Bot Modes
 
 ### Mode A: Local daemon bot (polling)
