@@ -176,6 +176,24 @@ Run:
 npm run bot:claim
 ```
 
+### Vercel Cron Mode (single-run trigger)
+
+This repo also supports Vercel Cron by invoking a single-run route handler:
+
+- Route: `/api/cron/claim`
+- Schedule: every minute (configured in `vercel.json`)
+
+Required Vercel env vars:
+
+- `SOROBAN_RPC_URL`
+- `GUARDIAN_CONTRACT_ID`
+- `NETWORK_PASSPHRASE`
+- `CLAIM_BOT_SECRET_KEY`
+- optional: `CLAIM_BOT_FINALITY_TIMEOUT_MS`
+- optional: `CRON_SECRET` (recommended, protects the cron endpoint)
+
+If `CRON_SECRET` is set, Vercel must call with `Authorization: Bearer <CRON_SECRET>`.
+
 ---
 
 ## Security Notes

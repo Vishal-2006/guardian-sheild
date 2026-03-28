@@ -177,6 +177,7 @@ export default function GuardianShieldDashboard() {
   const [depositAmount, setDepositAmount] = useState("10");
   const [thresholdFeedback, setThresholdFeedback] = useState<ThresholdFeedback>({ type: "idle" });
   const [configFeedback, setConfigFeedback] = useState<ConfigFeedback>({ type: "idle" });
+  const [loadingStartedAt] = useState(() => Date.now());
   const connectedAddress = useSyncExternalStore(
     () => () => {},
     () => window.localStorage.getItem("guardian_wallet_address") || "",
@@ -352,10 +353,36 @@ export default function GuardianShieldDashboard() {
     router.push("/");
   };
 
-  if (statusQuery.isLoading || !presentation) {
+  const hasStatusData = Boolean(statusQuery.data);
+  const loadingTooLong = Date.now() - loadingStartedAt > 12_000;
+  if (!hasStatusData && (statusQuery.isLoading || statusQuery.isFetching)) {
     return (
-      <section className="rounded-3xl border border-blue-400/20 bg-slate-950/60 p-6 text-blue-200">
-        Loading on-chain dashboard...
+      <section className="space-y-3 rounded-3xl border border-blue-400/20 bg-slate-950/60 p-6 text-blue-200">
+        <p>Loading on-chain dashboard...</p>
+        {loadingTooLong ? (
+          <div className="rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+            Still waiting for RPC response. Check `NEXT_PUBLIC_SOROBAN_RPC_URL`, `NEXT_PUBLIC_GUARDIAN_CONTRACT_ID`,
+            and `NEXT_PUBLIC_GUARDIAN_SOURCE_PUBLIC_KEY` in `.env.local`, then restart `npm run dev`.
+          </div>
+        ) : null}
+      </section>
+    );
+  }
+
+  if (statusQuery.isError || !presentation) {
+    return (
+      <section className="space-y-3 rounded-3xl border border-rose-500/30 bg-rose-500/10 p-6 text-rose-200">
+        <p className="text-sm font-semibold">Failed to load on-chain dashboard.</p>
+        <p className="text-xs text-rose-200/80">
+          {statusQuery.error instanceof Error ? statusQuery.error.message : "Unknown error"}
+        </p>
+        <button
+          type="button"
+          onClick={() => statusQuery.refetch()}
+          className="rounded-lg border border-rose-300/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-100 transition hover:bg-rose-500/20"
+        >
+          Retry
+        </button>
       </section>
     );
   }
@@ -552,12 +579,6 @@ export default function GuardianShieldDashboard() {
           </div>
         </aside>
       </div>
-
-      {statusQuery.isError ? (
-        <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
-          Failed to load on-chain vault status.
-        </p>
-      ) : null}
     </div>
   );
 }
