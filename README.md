@@ -7,8 +7,8 @@ Guardian Shield allows an owner to deposit funds and periodically check in. If i
 ## Demo
 
 - Demo video (1 minute): https://youtu.be/UBJtXyQNLoU
-- Live app: _add your Vercel URL here_
-- Test output screenshot: _add screenshot path/link here_
+- Live app: https://guardian-sheild.vercel.app/
+- Test output screenshot: included in submission (shows `11 passed; 0 failed`)
 
 ## Table of Contents
 
@@ -247,7 +247,7 @@ node scripts/guardian-claim-bot.mjs
 - [x] Mini-dApp functional
 - [x] 3+ tests passing (11 passing)
 - [x] README complete
-- [ ] Live demo URL added
-- [ ] Test output screenshot added
+- [x] Live demo URL added
+- [x] Test output screenshot added
 - [x] 1-minute demo video added
 - [ ] 3+ meaningful commits visible in Git history
