@@ -1,4 +1,4 @@
-# ??? Guardian Shield - Soroban Crypto Inheritance Vault
+# Guardian Shield - Soroban Crypto Inheritance Vault
 
 ![Stellar](https://img.shields.io/badge/Stellar-Soroban-0ea5e9?style=for-the-badge)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge)
@@ -11,14 +11,14 @@ Guardian Shield is a decentralized inheritance dApp on Stellar Soroban. The owne
 
 ---
 
-## ?? Live Links
+## Live Links
 
-- ?? **Live App (Vercel):** https://guardian-sheild.vercel.app/
-- ?? **Demo Video (1 min):** https://youtu.be/UBJtXyQNLoU
+- **Live App (Vercel):** https://guardian-sheild.vercel.app/
+- **Demo Video (1 min):** https://youtu.be/UBJtXyQNLoU
 
 ---
 
-## ?? About the Project
+## About the Project
 
 ### Owner Flow
 1. Connect wallet
@@ -40,7 +40,7 @@ Guardian Shield is a decentralized inheritance dApp on Stellar Soroban. The owne
 
 ---
 
-## ?? Tech Stack
+## Tech Stack
 
 - **Frontend:** Next.js 16, TypeScript, Tailwind CSS, React Query
 - **Smart Contract:** Rust + `soroban-sdk`
@@ -49,7 +49,7 @@ Guardian Shield is a decentralized inheritance dApp on Stellar Soroban. The owne
 
 ---
 
-## ?? Smart Contract API
+## Smart Contract API
 
 - `init(owner, beneficiaries, threshold_seconds)`
 - `deposit(amount)`
@@ -65,7 +65,7 @@ Guardian Shield is a decentralized inheritance dApp on Stellar Soroban. The owne
 
 ---
 
-## ?? Project Structure
+## Project Structure
 
 ```text
 app/                            Next.js app router pages and API routes
@@ -78,7 +78,7 @@ contract/contracts/guardian-shield/src/test.rs  Contract tests
 
 ---
 
-## ?? Local Setup
+## Local Setup
 
 ### 1) Install dependencies
 ```bash
@@ -102,7 +102,7 @@ npm run dev
 
 ---
 
-## ??? Contract Build & Deploy
+## Contract Build & Deploy
 
 From `contract/`:
 
@@ -125,7 +125,7 @@ stellar contract invoke --id <CONTRACT_ID> --source <owner_identity> --network t
 
 ---
 
-## ? Testing
+## Testing
 
 Run tests:
 
@@ -140,7 +140,7 @@ Current result: **11 passed, 0 failed**.
 
 ---
 
-## ?? Railway Bot (Auto Claim)
+## Railway Bot (Auto Claim)
 
 Use Railway to run auto-claim continuously.
 
@@ -164,7 +164,7 @@ Expected logs:
 
 ---
 
-## ?? Deployment
+## Deployment
 
 ### Vercel (Frontend)
 Set these env vars in Vercel:
@@ -179,7 +179,7 @@ Set bot vars listed above and run with:
 
 ---
 
-## ?? Security Notes
+## Security Notes
 
 - Never commit `.env.local`.
 - Never expose `S...` secret keys in public env.
@@ -188,7 +188,7 @@ Set bot vars listed above and run with:
 
 ---
 
-## ?? Troubleshooting
+## Troubleshooting
 
 - **Dashboard stuck on loading**
   - Check contract ID, RPC URL, and `NEXT_PUBLIC_GUARDIAN_SOURCE_PUBLIC_KEY`.
